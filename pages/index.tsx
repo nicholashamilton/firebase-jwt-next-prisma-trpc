@@ -1,11 +1,20 @@
-import { Inter } from "next/font/google";
+import SEO from "@/components/SEO";
+import RootLayout from "@/layouts/RootLayout";
+import { ReactElement } from "react";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export default function Home() {
+export default function HomePage() {
     return (
-        <main className={`block relative ${inter.className}`}>
-            <h1>Hello, World</h1>
-        </main>
+        <div className="block relative">
+            <SEO
+                title="Home"
+                description="Home"
+            />
+            <h1>Home</h1>
+        </div>
     );
+}
+
+
+HomePage.getLayout = function GetLayout(page: ReactElement) {
+    return <RootLayout innerClassName="!max-w-[2160px]">{page}</RootLayout>;
 }

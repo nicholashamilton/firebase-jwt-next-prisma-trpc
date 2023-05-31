@@ -1,15 +1,5 @@
 import axios from 'axios';
 
-const apiClientV1 = axios.create({
-    baseURL: `/api/v1`,
-    withCredentials: true,
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-    },
-});
-
 interface ErrorResponseDataWithMessage {
     message: string;
 }
@@ -28,9 +18,24 @@ function getAxiosErrorMessage(error: unknown, defaultErrorMessage: string = '') 
     return errorMessage;
 }
 
+async function getAxiosBlobErrorMessage(error: unknown, defaultErrorMessage: string = '') {
+    let errorMessage = defaultErrorMessage;
+
+    if (axios.isAxiosError(error)) {
+        const isJsonBlob = (data: unknown) => data instanceof Blob && data.type === 'application/json';
+        const responseData = isJsonBlob(error.response?.data) ? await (error.response?.data)?.text() : error.response?.data || {};
+        const responseJson = (typeof responseData === 'string') ? JSON.parse(responseData) : responseData;
+        if (isMessageInErrorResponseData(responseJson)) {
+            errorMessage = responseJson.message;
+        }
+    }
+
+    return errorMessage;
+}
+
 export {
-    apiClientV1,
     getAxiosErrorMessage,
+    getAxiosBlobErrorMessage,
 };
 
 export interface AxiosOptionalConfig {
