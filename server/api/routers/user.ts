@@ -19,7 +19,7 @@ export const userRouter = createTRPCRouter({
                 include: {
                     _count: {
                         select: {
-                            postedSpots: true,
+                            posts: true,
                             followers: true,
                             following: true,
                         },
@@ -36,8 +36,7 @@ export const userRouter = createTRPCRouter({
             return {
                 user: {
                     username: user.username,
-                    profileImage: user.profileImage,
-                    spotsCount: user._count.postedSpots,
+                    postsCount: user._count.posts,
                     followersCount: user._count.followers,
                     followingCount: user._count.following,
                 },

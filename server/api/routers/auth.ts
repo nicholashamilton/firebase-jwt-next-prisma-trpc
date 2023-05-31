@@ -107,9 +107,6 @@ export const authRouter = createTRPCRouter({
        updateProfile: protectedUserProcedure
             .input(z.object({
                 username: z.string(),
-                firstName: z.string(),
-                lastName: z.string(),
-                profileImage: z.string(),
             }))
             .mutation(async ({ ctx, input }) => {
 
@@ -141,7 +138,6 @@ export const authRouter = createTRPCRouter({
                 try {
                     const newFireUser = await adminAuth.updateUser(fireUser.uid, {
                         displayName: input.username,
-                        photoURL: input.profileImage ? input.profileImage : null,
                     });
 
                     updateProfileRes.user = newFireUser;
@@ -162,7 +158,6 @@ export const authRouter = createTRPCRouter({
                 catch (error) {
                     await adminAuth.updateUser(fireUser.uid, {
                         displayName: fireUser.displayName,
-                        photoURL: fireUser.photoURL,
                     });
                     updateProfileRes.message = 'Unknown error occurred while editing profile';
                     updateProfileRes.messageType = 'error';
