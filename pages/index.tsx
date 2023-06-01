@@ -26,5 +26,5 @@ export default function HomePage() {
 
 
 HomePage.getLayout = function GetLayout(page: ReactElement) {
-    return <RootLayout innerClassName="!max-w-[2160px]">{page}</RootLayout>;
+    return <RootLayout>{page}</RootLayout>;
 }

@@ -25,10 +25,10 @@ Preview production build
 npm run build && npm run start
 ``` 
 
-### Create `.env` from `.env.example` 
+### Create `.env.local` from `.env.local.example` 
 
 ```
-cp .env.example .env
+cp .env.local.example .env.local
 ```
 
 ### Firebase App Configuration
