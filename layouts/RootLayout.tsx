@@ -8,8 +8,8 @@ export default function RootLayout(props: {
 }) {
     return (
         <>
-            <Navigation />
-            <section className="block p-4 bg-slate-50">
+            <section className="block p-4">
+                <Navigation />
                 <div
                     className={classNames(
                         'block m-auto max-w-[800px]',
