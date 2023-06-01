@@ -51,6 +51,8 @@ Replace variables with [firebase console](https://console.firebase.google.com/) 
 
 `FIREBASE_SERVICE_ACCOUNT_KEY={}` 
 
+[Remove line breaks](https://www.textfixer.com/tools/remove-line-breaks.php) from service account json
+
 ### Roadmap 
 
 - [x] Sign Up - `synced with prisma UserAccount model`
