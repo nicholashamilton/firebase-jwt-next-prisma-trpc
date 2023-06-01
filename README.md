@@ -25,10 +25,10 @@ Preview production build
 npm run build && npm run start
 ``` 
 
-### Create `.env.local` from `.env.local.example` 
+### Create `.env` from `.env.example` 
 
 ```
-cp .env.local.example .env.local
+cp .env.example .env
 ```
 
 ### Firebase App Configuration
@@ -53,16 +53,27 @@ Replace variables with [firebase console](https://console.firebase.google.com/) 
 
 [Remove line breaks](https://www.textfixer.com/tools/remove-line-breaks.php) from service account json
 
+### Prisma Set Up 
+
+Add database url to `.env.local`
+
+`DATABASE_URL=''` 
+
+```
+npx prisma db push
+```
+
 ### Roadmap 
 
 - [x] Sign Up - `synced with prisma UserAccount model`
 - [x] Login
 - [x] Sign Out
 - [x] Password Reset
+- [x] Verify Email
 - [x] Update Email + Profile - `synced with prisma UserAccount model`
-- [x] Verify Email 
-- [ ] Public Profile w/ Followers + Following
-- [ ] All Posts
-- [ ] Create Post
+- [x] Public Profile w/ Followers + Following
+- [ ] Follow + Unfollow User
+- [x] Create Post
+- [x] All Posts
 
 <img src="./public/app-example.jpg" style="width: 100%; max-width: 800px; height: auto; margin-top: 16px;">
