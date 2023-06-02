@@ -71,8 +71,7 @@ npx prisma db push
 - [x] Password Reset
 - [x] Verify Email
 - [x] Update Email + Profile - `synced with prisma UserAccount model`
-- [x] Public Profile w/ Followers + Following
-- [ ] Follow + Unfollow User
+- [x] Public Profile w/ Posts Count
 - [x] Create Post
 - [x] All Posts
 

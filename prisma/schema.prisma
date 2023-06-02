@@ -27,10 +27,6 @@ model UserAccount {
     role UserRole
 
     posts      Post[]
-    likedPosts PostLike[]
-
-    followers UserFollow[] @relation("following")
-    following UserFollow[] @relation("follower")
 }
 
 model Post {
@@ -41,35 +37,6 @@ model Post {
     ownerId Int
 
     title String
-    slug  String @unique
-
-    likes PostLike[]
 
     @@index([ownerId])
-}
-
-model PostLike {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-
-    user   UserAccount @relation(fields: [userId], references: [id])
-    userId Int
-
-    post   Post @relation(fields: [postId], references: [id])
-    postId Int
-
-    @@index([userId])
-    @@index([postId])
-}
-
-model UserFollow {
-    follower   UserAccount @relation("follower", fields: [followerId], references: [id])
-    followerId Int
-
-    following   UserAccount @relation("following", fields: [followingId], references: [id])
-    followingId Int
-
-    @@id([followerId, followingId])
-    @@index([followerId])
-    @@index([followingId])
 }

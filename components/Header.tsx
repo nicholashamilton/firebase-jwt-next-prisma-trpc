@@ -27,6 +27,18 @@ export default function Navigation(props: Props) {
                             {user ?
                                 <>
                                     <NextLink
+                                        href={`/post/add-post`}
+                                        className="mr-4 text-lg font-medium"
+                                    >
+                                        Add Post
+                                    </NextLink>
+                                    <NextLink
+                                        href={`/user/${user.displayName}`}
+                                        className="mr-4 text-lg font-medium"
+                                    >
+                                        Profile
+                                    </NextLink>
+                                    <NextLink
                                         href="/edit-profile"
                                         className="mr-4 text-lg font-medium"
                                     >
@@ -39,19 +51,19 @@ export default function Navigation(props: Props) {
                             :
                                 <>
                                     <NextLink
-                                        href="login"
+                                        href="/login"
                                         className="mr-4 text-lg font-medium"
                                     >
                                         Login
                                     </NextLink>
                                     <NextLink
-                                        href="sign-up"
+                                        href="/sign-up"
                                         className="mr-4 text-lg font-medium"
                                     >
                                         Sign up
                                     </NextLink>
                                     <NextLink
-                                        href="forgot-password"
+                                        href="/forgot-password"
                                         className="text-lg font-medium"
                                     >
                                         Forgot Password

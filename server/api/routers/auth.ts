@@ -4,6 +4,7 @@ import { adminAuth } from '@/server/lib/firebaseAdmin';
 import { UserRecord } from "firebase-admin/lib/auth/user-record";
 import { prisma } from "@/server/lib/prisma";
 import { UserAccount } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 type MessageType = 'default' | 'error' | 'info' | 'success' | 'warning';
 
@@ -95,8 +96,10 @@ export const authRouter = createTRPCRouter({
          */
         getProfile: protectedUserProcedure
             .query(async ({ ctx }) => {
+                if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+
                 const user = await ctx.prisma.userAccount.findUnique({
-                    where: { uid: ctx.user?.uid ?? '' },
+                    where: { uid: ctx.user.uid },
                 });
                 return user;
             }),
@@ -123,7 +126,9 @@ export const authRouter = createTRPCRouter({
                     messageType: 'default',
                 };
 
-                const fireUser = await adminAuth.getUser(ctx.user?.uid ?? '');
+                if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+
+                const fireUser = await adminAuth.getUser(ctx.user.uid);
                 const fireUserDisplayName = fireUser.displayName ?? '';
 
                 // Username Verification

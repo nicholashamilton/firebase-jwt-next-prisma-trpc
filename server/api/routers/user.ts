@@ -20,8 +20,6 @@ export const userRouter = createTRPCRouter({
                     _count: {
                         select: {
                             posts: true,
-                            followers: true,
-                            following: true,
                         },
                     },
                 },
@@ -37,8 +35,6 @@ export const userRouter = createTRPCRouter({
                 user: {
                     username: user.username,
                     postsCount: user._count.posts,
-                    followersCount: user._count.followers,
-                    followingCount: user._count.following,
                 },
             };
         }),
