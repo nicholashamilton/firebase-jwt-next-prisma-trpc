@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
 
@@ -26,9 +27,7 @@ export const userRouter = createTRPCRouter({
             });
 
             if (!user) {
-                return {
-                    message: 'User not found',
-                };
+                throw new TRPCError({ code: 'NOT_FOUND' });
             }
 
             return {
