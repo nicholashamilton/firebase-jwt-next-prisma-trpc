@@ -105,8 +105,22 @@ export const publicProcedure = t.procedure;
  */
 const isAuthed = t.middleware((opts) => {
     const { ctx } = opts;
-    if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
-    return opts.next();
+    if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You must be logged in.', });
+    return opts.next({
+        ctx: { user: ctx.user },
+    });
+});
+const isAuthedWithUserAccount = t.middleware(async (opts) => {
+    const { ctx } = opts;
+    if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You must be logged in.', });
+    const userAccount = await ctx.prisma.userAccount.findUnique({ where: { uid: ctx.user.uid } });
+    if (!userAccount) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You must be logged in.', });
+    return opts.next({
+        ctx: {
+            user: ctx.user,
+            userAccount,
+        },
+    });
 });
 
 /**
@@ -115,12 +129,22 @@ const isAuthed = t.middleware((opts) => {
 export const protectedUserProcedure = t.procedure.use(isAuthed);
 
 /**
+ * Protected user procedure with account
+ */
+export const protectedUserWithAccountProcedure = t.procedure.use(isAuthedWithUserAccount);
+
+/**
  * Middleware to enforce a user is an admin
  */
 const isAdmin = t.middleware((opts) => {
     const { ctx } = opts;
-    if (ctx.user?.role !== 'admin') throw new TRPCError({ code: 'UNAUTHORIZED' });
-    return opts.next();
+    if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You must be logged in.', });
+    if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'UNAUTHORIZED' });
+    return opts.next({
+        ctx: {
+            user: ctx.user,
+        },
+    });
 });
 
 /**

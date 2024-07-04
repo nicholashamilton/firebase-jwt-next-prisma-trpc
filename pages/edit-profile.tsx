@@ -9,14 +9,15 @@ import RootLayout from "@/layouts/RootLayout";
 import { User, sendEmailVerification, signInWithCustomToken } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { UserAccount } from "@prisma/client";
+import { showTrpcError } from "@/lib/trpc";
 
 export default function EditProfilePage() {
 
-    const { profile, user } = useUserContext();
+    const { userAccount, user } = useUserContext();
 
     useRedirectToLoginIfNoUser();
 
-    if (!user || !profile) return null;
+    if (!user || !userAccount) return null;
 
     return (
         <>
@@ -27,9 +28,9 @@ export default function EditProfilePage() {
             <h1 className="my-8 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl">
                 Edit Profile
             </h1>
-            <EditProfileForms
+            <EditUserAccountForm
                 user={user}
-                profile={profile}
+                userAccount={userAccount}
             />
         </>
     );
@@ -39,29 +40,29 @@ EditProfilePage.getLayout = function GetLayout(page: ReactElement) {
     return <RootLayout>{page}</RootLayout>;
 }
 
-function EditProfileForms(props: {
+function EditUserAccountForm(props: {
     user: User;
-    profile: UserAccount;
+    userAccount: UserAccount;
 }) {
 
     const { setUser } = useUserContext();
 
     const mutation = api.auth.updateProfile.useMutation();
-    const utils = api.useContext();
+    const utils = api.useUtils();
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formUser, setFormUser] = useState({
-        email: props.profile?.email ?? '',
-        username: props.profile?.username ?? '',
+        email: props.userAccount?.email ?? '',
+        username: props.userAccount?.username ?? '',
     });
 
     useEffect(function syncFormUserWithProfile() {
         setFormUser({
-            email: props.profile?.email ?? '',
-            username: props.profile?.username ?? '',
+            email: props.userAccount?.email ?? '',
+            username: props.userAccount?.username ?? '',
         });
-    }, [props.profile]);
+    }, [props.userAccount]);
 
     async function handleUpdateProfile(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -69,33 +70,22 @@ function EditProfileForms(props: {
         try {
             setIsSubmitting(true);
 
-            const updateProfileRes = await mutation.mutateAsync(formUser);
+            const { message, userAccount, token } = await mutation.mutateAsync(formUser);
 
-            toast(updateProfileRes.message, {
-                type: updateProfileRes.messageType,
+            toast(message, { type: 'success' });
+
+            utils.auth.getCurrentUserAccount.setData(undefined, { userAccount });
+
+            setUser({
+                ...props.user,
+                email: userAccount.email,
+                displayName: userAccount.username,
             });
 
-            if (updateProfileRes.user && updateProfileRes.profile) {
-
-                utils.auth.getProfile.setData(undefined, updateProfileRes.profile);
-
-                setUser({
-                    ...props.user,
-                    email: updateProfileRes.profile.email,
-                    displayName: updateProfileRes.profile.username,
-                });
-
-                if (updateProfileRes.token) {
-                    await signInWithCustomToken(auth, updateProfileRes.token);
-                }
-            }
+            await signInWithCustomToken(auth, token);
         }
         catch (error) {
-            let errorMessage = 'Unknown error occurred while editing profile';
-
-            toast(errorMessage, {
-                type: 'error',
-            });
+            showTrpcError(error);
         }
 
         setIsSubmitting(false);
@@ -109,16 +99,10 @@ function EditProfileForms(props: {
 
             await sendEmailVerification(props.user);
 
-            toast('Email Verification Sent.', {
-                type: 'success',
-            });
+            toast('Email verification sent.', { type: 'success' });
         }
         catch (error) {
-            let errorMessage = 'Unknown error occurred while sending email verification.';
-
-            toast(errorMessage, {
-                type: 'error',
-            });
+            toast('Issue sending email verification.', { type: 'error' });
         }
 
         setIsSubmitting(false);

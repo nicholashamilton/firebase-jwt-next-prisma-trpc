@@ -12,7 +12,6 @@ export const userRouter = createTRPCRouter({
             username: z.string(),
         }))
         .query(async ({ ctx, input }) => {
-
             const { username } = input;
 
             const user = await ctx.prisma.userAccount.findUnique({
@@ -26,9 +25,7 @@ export const userRouter = createTRPCRouter({
                 },
             });
 
-            if (!user) {
-                throw new TRPCError({ code: 'NOT_FOUND' });
-            }
+            if (!user) throw new TRPCError({ code: 'NOT_FOUND' });
 
             return {
                 user: {

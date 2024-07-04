@@ -6,8 +6,6 @@ import { prisma } from "@/server/lib/prisma";
 import { UserAccount } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-type MessageType = 'default' | 'error' | 'info' | 'success' | 'warning';
-
 enum UserRole {
     admin = 'admin',
     user = 'user',
@@ -25,52 +23,39 @@ export const authRouter = createTRPCRouter({
             username: z.string(),
         }))
         .mutation(async ({ ctx, input }) => {
-
-            const signUpRes: {
-                user?: UserRecord;
-                token?: string;
-                message: string;
-                messageType: MessageType;
-            } = {
-                message: 'There was an issue creating the user',
-                messageType: 'default',
-            };
+            let fireUser: UserRecord | undefined = undefined;
+            let token = '';
+            const defaultError = 'Issue creating an account.';
 
             // Username Verification
-            const { errorMessage, messageType } = await verifyNewUsername(input.username);
-            if (errorMessage) {
-                signUpRes.message = errorMessage;
-                signUpRes.messageType = messageType;
-                return signUpRes;
-            }
+            const { error } = await validateUsername(input.username);
+            if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error });
 
             // Create Firebase User
             try {
-                const newFireUser = await adminAuth.createUser({
+                fireUser = await adminAuth.createUser({
                     email: input.email,
                     password: input.password,
                     displayName: input.username,
                 });
 
-                signUpRes.user = newFireUser;
-
-                await adminAuth.setCustomUserClaims(newFireUser.uid, {
-                    role: UserRole.user,
+                await adminAuth.setCustomUserClaims(fireUser.uid, {
+                    role: UserRole.user, // Assign 'user' role
                 });
 
-                signUpRes.token = await adminAuth.createCustomToken(newFireUser.uid);
+                token = await adminAuth.createCustomToken(fireUser.uid);
             }
             catch (error) {
-                if (signUpRes.user) await adminAuth.deleteUser(signUpRes.user.uid);
-                signUpRes.message = error instanceof Error ? error.message : 'Unknown error occurred while creating user';
-                return signUpRes;
+                if (fireUser) await adminAuth.deleteUser(fireUser.uid);
+                const message = error instanceof Error ? error.message : defaultError;
+                throw new TRPCError({ code: 'BAD_REQUEST', message });
             }
 
-            // Create Prisma User
+            // Create DB UserAccount
             try {
                 await ctx.prisma.userAccount.create({
                     data: {
-                        uid: signUpRes.user.uid,
+                        uid: fireUser.uid,
                         email: input.email,
                         username: input.username,
                         role: UserRole.user,
@@ -78,30 +63,26 @@ export const authRouter = createTRPCRouter({
                 });
             }
             catch (error) {
-                await adminAuth.deleteUser(signUpRes.user.uid);
-                signUpRes.message = 'Unknown error occurred while creating user';
-                signUpRes.messageType = 'error';
-                return signUpRes;
+                await adminAuth.deleteUser(fireUser.uid);
+                throw new TRPCError({ code: 'BAD_REQUEST', message: defaultError });
             }
 
-            // Success
-            signUpRes.message = 'Account created';
-            signUpRes.messageType = 'success';
-
-            return signUpRes;
+            return {
+                token,
+                message: 'Account created.',
+            };
         }),
 
         /*
-         * Get Profile
+         * Get Current User Account
          */
-        getProfile: protectedUserProcedure
+        getCurrentUserAccount: protectedUserProcedure
             .query(async ({ ctx }) => {
-                if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
-
-                const user = await ctx.prisma.userAccount.findUnique({
-                    where: { uid: ctx.user.uid },
-                });
-                return user;
+                return {
+                    userAccount: await ctx.prisma.userAccount.findUnique({
+                        where: { uid: ctx.user.uid },
+                    }),
+                };
             }),
 
         /*
@@ -114,116 +95,84 @@ export const authRouter = createTRPCRouter({
             }))
             .mutation(async ({ ctx, input }) => {
 
-                const updateProfileRes: {
-                    profile: UserAccount | null,
-                    user?: UserRecord;
-                    token?: string;
-                    message: string;
-                    messageType: MessageType;
-                } = {
-                    profile: null,
-                    message: 'There was an issue creating the user',
-                    messageType: 'default',
-                };
-
-                if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
-
-                const fireUser = await adminAuth.getUser(ctx.user.uid);
+                let fireUser = await adminAuth.getUser(ctx.user.uid);
                 const fireUserDisplayName = fireUser.displayName ?? '';
+
+                let userAccount: UserAccount | undefined = undefined;
+                let token = '';
+                const defaultError = 'Issue updating profile.';
 
                 // Username Verification
                 if (input.username !== fireUserDisplayName) {
-                    const { errorMessage, messageType } = await verifyNewUsername(input.username);
-                    if (errorMessage) {
-                        updateProfileRes.message = errorMessage;
-                        updateProfileRes.messageType = messageType;
-                        return updateProfileRes;
-                    }
+                    const { error } = await validateUsername(input.username);
+                    if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error });
                 }
 
-                // Update Firebase User
                 try {
-                    const newFireUser = await adminAuth.updateUser(fireUser.uid, {
-                        email: input.email,
-                        displayName: input.username,
+                    return await ctx.prisma.$transaction(async (trx) => {
+                        // Update prisma user
+                        userAccount = await trx.userAccount.update({
+                            where: { uid: fireUser.uid },
+                            data: input,
+                        });
+
+                        // Update firebase user
+                        fireUser = await adminAuth.updateUser(fireUser.uid, {
+                            email: input.email,
+                            displayName: input.username,
+                        });
+
+                        token = await adminAuth.createCustomToken(fireUser.uid);
+
+                        return {
+                            message: 'Profile updated.',
+                            userAccount,
+                            token,
+                        };
                     });
-
-                    updateProfileRes.user = newFireUser;
-
-                    updateProfileRes.token = await adminAuth.createCustomToken(newFireUser.uid);
                 }
                 catch (error) {
-                    updateProfileRes.message = error instanceof Error ? error.message : 'Unknown error occurred while editing profile';
-                    return updateProfileRes;
+                    throw new TRPCError({ code: 'BAD_REQUEST', message: defaultError });
                 }
-
-                // Update Prisma User
-                try {
-                    const prismaUser = await ctx.prisma.userAccount.update({
-                        where: { uid: fireUser.uid },
-                        data: input,
-                    });
-                    updateProfileRes.profile = prismaUser;
-                }
-                catch (error) {
-                    await adminAuth.updateUser(fireUser.uid, {
-                        displayName: fireUser.displayName,
-                    });
-                    updateProfileRes.message = 'Unknown error occurred while editing profile';
-                    updateProfileRes.messageType = 'error';
-                    return updateProfileRes;
-                }
-
-                // Success
-                updateProfileRes.message = 'Profile Updated';
-                updateProfileRes.messageType = 'success';
-
-                return updateProfileRes;
             }),
 });
 
-/*
- * Matches string that contains only alphanumeric characters, hyphens, and underscores
+/**
+ * Validate Username
  */
-function isUsernameFormatValid(username: string) {
-    return new RegExp('^[a-zA-Z0-9-_]+$').test(username);
-}
-
-async function verifyNewUsername(username: string) {
-    const res: {
-        errorMessage: string;
-        messageType: MessageType;
-    } = {
-        errorMessage: '',
-        messageType: 'default',
-    };
+async function validateUsername(username: string) {
+    let error = '';
 
     try {
         if (!isUsernameFormatValid(username)) {
-            res.errorMessage = 'Username must only contain letters, numbers, hyphens and underscores';
-            res.messageType = 'warning';
+            error = 'Username must only contain letters, numbers, underscores and periods.';
         }
 
         if (!username) {
-            res.errorMessage = 'Username can not be empty';
-            res.messageType = 'warning';
+            error = 'Username can not be empty';
         }
 
         if (username.length > 30) {
-            res.errorMessage = 'Username can not be longer than 30 characters';
-            res.messageType = 'warning';
+            error = 'Username can not be longer than 30 characters';
         }
 
         const existingUsername = await prisma.userAccount.findUnique({ where: { username } });
         if (existingUsername) {
-            res.errorMessage = 'Username is already taken';
-            res.messageType = 'warning';
+            error = 'Username is already taken';
         }
     }
     catch (error) {
-        res.errorMessage = 'Unknown error occurred while editing profile';
-        res.messageType = 'error';
+        error = 'An issue occurred.';
     }
 
-    return res;
+    return {
+        error,
+    };
+}
+
+/*
+ * Matches string that contains only alphanumeric characters, underscores and periods
+ */
+function isUsernameFormatValid(username: string) {
+    return new RegExp('^[a-zA-Z0-9._]+$').test(username);
 }

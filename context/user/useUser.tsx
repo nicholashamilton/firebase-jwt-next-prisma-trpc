@@ -16,7 +16,7 @@ export const useUser = () => {
         return () => unsubscribe();
     }, []);
 
-    const { data: profileData, isLoading: isProfileLoading } = api.auth.getProfile.useQuery(
+    const { data, isLoading: isUserAccountLoading } = api.auth.getCurrentUserAccount.useQuery(
         undefined,
         {
             enabled: !!user,
@@ -24,16 +24,15 @@ export const useUser = () => {
         },
     );
 
-    const profile = useMemo(function getProfile() {
-        return profileData ? profileData : null;
-    }, [profileData]);
+    const userAccount = useMemo(() => data ? data.userAccount : null, [data]);
 
     return {
         user,
         setUser,
         isUserLoading,
-        profile,
-        isProfileLoading,
+
+        userAccount,
+        isUserAccountLoading,
     };
 };
 

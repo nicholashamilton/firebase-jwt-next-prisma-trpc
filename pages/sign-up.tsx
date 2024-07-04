@@ -8,6 +8,7 @@ import { useUserContext } from "@/context/user/useUserContext";
 import { useRedirectToProfileIfUser } from "@/hooks/user/useRedirectToProfileIfUser";
 import SEO from "@/components/SEO";
 import RootLayout from "@/layouts/RootLayout";
+import { showTrpcError } from "@/lib/trpc";
 
 export default function SignUp() {
 
@@ -40,20 +41,14 @@ export default function SignUp() {
         try {
             setIsSubmitting(true);
 
-            const signupRes = await mutation.mutateAsync(formUser);
+            const { message, token } = await mutation.mutateAsync(formUser);
 
-            toast(signupRes.message, {
-                type: signupRes.messageType,
-            });
+            toast(message, { type: 'success' });
 
-            if (signupRes.user && signupRes.token) {
-                await signInWithCustomToken(auth, signupRes.token);
-            }
+            await signInWithCustomToken(auth, token);
         }
         catch (error) {
-            toast('Unknown error occurred while creating user', {
-                type: 'error',
-            });
+            showTrpcError(error);
         }
 
         setIsSubmitting(false);
