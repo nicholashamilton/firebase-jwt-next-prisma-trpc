@@ -74,5 +74,6 @@ npx prisma db push
 - [x] Public Profile w/ Posts Count
 - [x] Create Post
 - [x] All Posts
+    - [x] Infinite Scroll w/ Cursor Based Pagination
 
 <img src="./public/app-example.jpg" style="width: 100%; max-width: 800px; height: auto; margin-top: 16px;">

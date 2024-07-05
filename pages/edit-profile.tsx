@@ -1,7 +1,6 @@
 import Button from "@/components/Button";
 import SEO from "@/components/SEO";
 import { useUserContext } from "@/context/user/useUserContext";
-import { useRedirectToLoginIfNoUser } from "@/hooks/user/useRedirectToLoginIfNoUser";
 import { FormEvent, ReactElement, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { api } from "@/server/apiClient";
@@ -10,29 +9,35 @@ import { User, sendEmailVerification, signInWithCustomToken } from "firebase/aut
 import { auth } from "@/lib/firebase";
 import { UserAccount } from "@prisma/client";
 import { showTrpcError } from "@/lib/trpc";
+import RequireUser from "@/components/RequireUser";
+import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 
 export default function EditProfilePage() {
 
-    const { userAccount, user } = useUserContext();
-
-    useRedirectToLoginIfNoUser();
-
-    if (!user || !userAccount) return null;
+    const { userAccount } = useUserContext();
 
     return (
-        <>
-            <SEO
-                title="Edit Profile"
-                description="Edit Profile"
-            />
-            <h1 className="my-8 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl">
-                Edit Profile
-            </h1>
-            <EditUserAccountForm
-                user={user}
-                userAccount={userAccount}
-            />
-        </>
+        <RequireUser>
+            {(user) => (
+                <>
+                    <SEO
+                        title="Edit Profile"
+                        description="Edit Profile"
+                    />
+                    <h1 className="my-8 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl">
+                        Edit Profile
+                    </h1>
+                    {userAccount ? (
+                        <EditUserAccountForm
+                            user={user}
+                            userAccount={userAccount}
+                        />
+                    ) :
+                        <div className="p-8 w-full flex justify-center"><LoadingSpinner /></div>
+                    }
+                </>
+            )}
+        </RequireUser>
     );
 }
 

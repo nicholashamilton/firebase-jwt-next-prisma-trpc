@@ -10,12 +10,10 @@ import { useUserContext } from "@/context/user/useUserContext";
 export default function AddPostPage() {
 
     const { user } = useUserContext();
-
     const router = useRouter();
-
     const mutation = api.posts.addPost.useMutation();
-
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const utils = api.useUtils();
 
     async function handleUploadPost(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -31,6 +29,8 @@ export default function AddPostPage() {
             await mutation.mutateAsync({
                 title: post.title,
             });
+
+            utils.posts.getAllPosts.reset()
 
             setIsSubmitting(false);
 
