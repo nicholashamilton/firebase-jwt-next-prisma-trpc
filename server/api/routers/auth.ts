@@ -73,68 +73,69 @@ export const authRouter = createTRPCRouter({
             };
         }),
 
-        /*
-         * Get Current User Account
-         */
-        getCurrentUserAccount: protectedUserProcedure
-            .query(async ({ ctx }) => {
-                return {
-                    userAccount: await ctx.prisma.userAccount.findUnique({
-                        where: { uid: ctx.user.uid },
-                    }),
-                };
-            }),
+    /*
+     * Get Current User Account
+     */
+    getCurrentUserAccount: protectedUserProcedure
+        .query(async ({ ctx }) => {
+            return {
+                userAccount: await ctx.prisma.userAccount.findUnique({
+                    where: { uid: ctx.user.uid },
+                }),
+            };
+        }),
 
-        /*
-         * Update Profile
-         */
-       updateProfile: protectedUserProcedure
-            .input(z.object({
-                email: z.string(),
-                username: z.string(),
-            }))
-            .mutation(async ({ ctx, input }) => {
+    /*
+     * Update Profile
+     */
+    updateProfile: protectedUserProcedure
+        .input(z.object({
+            email: z.string(),
+            username: z.string(),
+        }))
+        .mutation(async ({ ctx, input }) => {
 
-                let fireUser = await adminAuth.getUser(ctx.user.uid);
-                const fireUserDisplayName = fireUser.displayName ?? '';
+            let fireUser = await adminAuth.getUser(ctx.user.uid);
+            const fireUserDisplayName = fireUser.displayName ?? '';
 
-                let userAccount: UserAccount | undefined = undefined;
-                let token = '';
-                const defaultError = 'Issue updating profile.';
+            let userAccount: UserAccount | undefined = undefined;
+            let token = '';
+            const defaultError = 'Issue updating profile.';
 
-                // Username Verification
-                if (input.username !== fireUserDisplayName) {
-                    const { error } = await validateUsername(input.username);
-                    if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error });
-                }
+            // Username Verification
+            if (input.username !== fireUserDisplayName) {
+                const { error } = await validateUsername(input.username);
+                if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error });
+            }
 
-                try {
-                    return await ctx.prisma.$transaction(async (trx) => {
-                        // Update prisma user
-                        userAccount = await trx.userAccount.update({
-                            where: { uid: fireUser.uid },
-                            data: input,
-                        });
-
-                        // Update firebase user
-                        fireUser = await adminAuth.updateUser(fireUser.uid, {
-                            email: input.email,
-                            displayName: input.username,
-                        });
-
-                        token = await adminAuth.createCustomToken(fireUser.uid);
-
-                        return {
-                            message: 'Profile updated.',
-                            userAccount,
-                            token,
-                        };
+            try {
+                return await ctx.prisma.$transaction(async (trx) => {
+                    // Update prisma user
+                    userAccount = await trx.userAccount.update({
+                        where: { uid: fireUser.uid },
+                        data: input,
                     });
-                }
-                catch (error) {
-                    throw new TRPCError({ code: 'BAD_REQUEST', message: defaultError });
-                }
-            }),
+
+                    // Update firebase user
+                    fireUser = await adminAuth.updateUser(fireUser.uid, {
+                        email: input.email,
+                        displayName: input.username,
+                    });
+
+                    token = await adminAuth.createCustomToken(fireUser.uid);
+
+                    return {
+                        message: 'Profile updated.',
+                        userAccount,
+                        token,
+                    };
+                });
+            }
+            catch (error) {
+                const message = error instanceof Error ? error.message : defaultError;
+                throw new TRPCError({ code: 'BAD_REQUEST', message });
+            }
+        }),
 });
 
 /**
