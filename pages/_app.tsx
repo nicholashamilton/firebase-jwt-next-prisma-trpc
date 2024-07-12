@@ -7,6 +7,8 @@ import { UserProvider } from "@/context/user/useUserContext";
 import { useFixSafariBackSwipe } from "@/hooks/useFixSafariBackSwipe";
 import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,10 +33,11 @@ function WebApp({ Component, pageProps }: AppPropsWithLayout) {
                 content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover'
             />
             <UserProvider>
-                <main className={inter.className}>
+                <main className={cn(inter.className, 'antialiased')}>
                     {/* <UserInfo /> */}
                     {getLayout(<Component {...pageProps} />)}
                     <ToastNotifications />
+                    <Toaster />
                 </main>
             </UserProvider>
         </>
