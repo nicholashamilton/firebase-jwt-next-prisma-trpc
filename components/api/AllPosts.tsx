@@ -48,7 +48,7 @@ export default function AllPosts() {
                                 <Card key={post.id}>
                                     <CardHeader className="p-4">
                                         <CardTitle className="mb-1">{post.title}</CardTitle>
-                                        <CardDescription>
+                                        <div>
                                             <NextLink
                                                 href={`/user/${post.user.username}`}
                                                 className="inline-flex flex-row items-center"
@@ -62,7 +62,7 @@ export default function AllPosts() {
                                                     {post.user.username}
                                                 </span>
                                             </NextLink>
-                                        </CardDescription>
+                                        </div>
                                     </CardHeader>
                                 </Card>
                             ));

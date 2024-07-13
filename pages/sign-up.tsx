@@ -12,7 +12,7 @@ export default function SignUp() {
                 title="Sign Up"
                 description="Sign Up"
             />
-            <Typography variant="h2">
+            <Typography variant="h2" className="my-8">
                 Sign Up
             </Typography>
             <SignUpForm />

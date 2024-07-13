@@ -20,20 +20,30 @@ export default function EditProfilePage() {
                         title="Edit Profile"
                         description="Edit Profile"
                     />
-                    <Typography variant="h2" className="my-8">
+                    <Typography variant="h2" className="mt-8 mb-10">
                         Edit Profile
                     </Typography>
                     {userAccount ? (
-                        <EditUserAccountForm
-                            user={user}
-                            userAccount={userAccount}
-                        />
+                        <>
+                            <Typography variant="h3" className="mb-4">
+                                Profile
+                            </Typography>
+                            <EditUserAccountForm
+                                user={user}
+                                userAccount={userAccount}
+                            />
+                        </>
                     ) :
                         <div className="p-8 w-full flex justify-center"><LoadingSpinner /></div>
                     }
-                    <VerifyEmailForm
-                        user={user}
-                    />
+                    <div className="mt-16">
+                        <Typography variant="h3" className="mb-4">
+                            Email Verification
+                        </Typography>
+                        <VerifyEmailForm
+                            user={user}
+                        />
+                    </div>
                 </>
             )}
         </RequireUser>

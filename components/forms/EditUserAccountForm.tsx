@@ -1,3 +1,5 @@
+'use client'
+
 import { useUserContext } from "@/context/user/useUserContext";
 import { api } from "@/server/apiClient";
 import { User, signInWithCustomToken } from "firebase/auth";
@@ -5,9 +7,9 @@ import { auth } from "@/lib/firebase";
 import { UserAccount } from "@prisma/client";
 import { showTrpcError } from "@/lib/trpc";
 import { z } from "zod";
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -89,7 +91,7 @@ export default function EditUserAccountForm(props: {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">
+                <Button type="submit" disabled={form.formState.isSubmitting}>
                     {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Save Profile
                 </Button>

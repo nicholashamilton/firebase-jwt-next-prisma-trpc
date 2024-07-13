@@ -1,7 +1,8 @@
-import Button from "@/components/Button";
 import { FormEvent, useState } from "react";
 import { User, sendEmailVerification } from "firebase/auth";
 import { toast } from "../ui/use-toast";
+import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
 
 export default function VerifyEmailForm(props: {
     user: User;
@@ -28,13 +29,10 @@ export default function VerifyEmailForm(props: {
 
     return (
         <form onSubmit={handleVerifyEmail}>
-            <h4 className="mb-2 text-xl font-bold">Email Verification</h4>
-            <Button
-                label={`Verify Email ${props.user.emailVerified ? '(email already verified)' : ''}`}
-                type="submit"
-                disabled={isSubmitting || props.user.emailVerified}
-                className={isSubmitting || props.user.emailVerified ? 'opacity-50' : ''}
-            />
+            <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {`Verify Email ${props.user.emailVerified ? '(email already verified)' : ''}`}
+            </Button>
         </form>
     );
 }
