@@ -1,5 +1,4 @@
 import { FormEvent, ReactElement, useState } from "react";
-import { toast } from 'react-toastify';
 import { useUserContext } from "@/context/user/useUserContext";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, firebaseErrorRecord, isFirebaseError } from "@/lib/firebase";
@@ -7,6 +6,7 @@ import Button from "@/components/Button";
 import { useRedirectToProfileIfUser } from "@/hooks/user/useRedirectToProfileIfUser";
 import SEO from "@/components/SEO";
 import RootLayout from "@/layouts/RootLayout";
+import { toast } from "@/components/ui/use-toast";
 
 export default function Login() {
 
@@ -45,9 +45,7 @@ export default function Login() {
                 errorMessage = firebaseErrorRecord[error.code];
             }
 
-            toast(errorMessage, {
-                type: 'error',
-            });
+            toast({ title: errorMessage, variant: 'destructive' });
         }
 
         setIsSubmitting(false);

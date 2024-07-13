@@ -3,10 +3,10 @@ import { useRedirectToProfileIfUser } from "@/hooks/user/useRedirectToProfileIfU
 import { useUserContext } from "@/context/user/useUserContext";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth, firebaseErrorRecord, isFirebaseError } from "@/lib/firebase";
-import { toast } from "react-toastify";
 import SEO from "@/components/SEO";
 import Button from "@/components/Button";
 import RootLayout from "@/layouts/RootLayout";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ForgotPassword() {
 
@@ -39,9 +39,7 @@ export default function ForgotPassword() {
 
             setFormUser({ email: '' });
 
-            toast('Password Reset Email Sent.', {
-                type: 'success',
-            });
+            toast({ title: 'Password reset email sent.' });
         }
         catch (error) {
             let errorMessage = 'Unknown error occurred while sending password reset email.';
@@ -50,9 +48,7 @@ export default function ForgotPassword() {
                 errorMessage = firebaseErrorRecord[error.code];
             }
 
-            toast(errorMessage, {
-                type: 'error',
-            });
+            toast({ title: errorMessage, variant: 'destructive' });
         }
 
         setIsSubmitting(false);

@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast as shadtoast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { ToastAction } from "../ui/toast";
 
 const FormSchema = z.object({
@@ -41,12 +41,12 @@ export function AddPostForm() {
 
             utils.posts.getAllPosts.reset()
 
-            shadtoast({ title: 'Post added successfully.' });
+            toast({ title: 'Post added successfully.' });
 
             router.push('/');
         }
         catch (error) {
-            shadtoast({ title: 'An issue occurred while adding the post.', variant: 'destructive' });
+            toast({ title: 'An issue occurred while adding the post.', variant: 'destructive' });
         }
     }
 
@@ -63,7 +63,7 @@ export function AddPostForm() {
                                 <Input placeholder="Enter title..." {...field} />
                             </FormControl>
                             <FormDescription>
-                                Don't think too long or hard.
+                                {`Don't think long or too hard.`}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -79,7 +79,7 @@ export function AddPostForm() {
 }
 
 function promptLogin(router?: NextRouter) {
-    shadtoast({
+    toast({
         title: "You must be logged in to create a post.",
         description: 'wejnfkwhbfhkwehkbfw',
         action: router ? (

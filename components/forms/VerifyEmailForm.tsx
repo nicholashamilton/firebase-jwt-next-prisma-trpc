@@ -1,7 +1,7 @@
 import Button from "@/components/Button";
 import { FormEvent, useState } from "react";
-import { toast } from "react-toastify";
 import { User, sendEmailVerification } from "firebase/auth";
+import { toast } from "../ui/use-toast";
 
 export default function VerifyEmailForm(props: {
     user: User;
@@ -17,10 +17,10 @@ export default function VerifyEmailForm(props: {
 
             await sendEmailVerification(props.user);
 
-            toast('Email verification sent.', { type: 'success' });
+            toast({ title: 'Email verification sent.' });
         }
         catch (error) {
-            toast('Issue sending email verification.', { type: 'error' });
+            toast({ title: 'Issue sending email verification.', variant: 'destructive' });
         }
 
         setIsSubmitting(false);

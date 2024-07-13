@@ -2,7 +2,6 @@ import "@/styles/globals.scss";
 import type { AppProps } from "next/app";
 import { api } from "@/server/apiClient";
 import { Inter } from "next/font/google";
-import ToastNotifications from "@/components/ToastNotifications";
 import { UserProvider } from "@/context/user/useUserContext";
 import { useFixSafariBackSwipe } from "@/hooks/useFixSafariBackSwipe";
 import { ReactElement, ReactNode } from "react";
@@ -36,7 +35,6 @@ function WebApp({ Component, pageProps }: AppPropsWithLayout) {
                 <main className={cn(inter.className, 'antialiased')}>
                     {/* <UserInfo /> */}
                     {getLayout(<Component {...pageProps} />)}
-                    <ToastNotifications />
                     <Toaster />
                 </main>
             </UserProvider>

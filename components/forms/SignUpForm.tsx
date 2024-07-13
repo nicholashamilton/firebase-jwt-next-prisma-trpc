@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast as shadtoast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { useRedirectToProfileIfUser } from "@/hooks/user/useRedirectToProfileIfUser";
 import { signInWithCustomToken } from "@firebase/auth";
 import { showTrpcError } from "@/lib/trpc";
@@ -50,7 +50,7 @@ export function SignUpForm() {
 
             const { message, token } = await mutation.mutateAsync(data);
 
-            shadtoast({ title: message });
+            toast({ title: message });
 
             await signInWithCustomToken(auth, token);
         }

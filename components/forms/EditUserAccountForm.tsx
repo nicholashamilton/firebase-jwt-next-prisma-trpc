@@ -1,5 +1,4 @@
 import { useUserContext } from "@/context/user/useUserContext";
-import { toast } from "react-toastify";
 import { api } from "@/server/apiClient";
 import { User, signInWithCustomToken } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -12,6 +11,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/
 import { Input } from "../ui/input";
 import { Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
+import { toast } from "../ui/use-toast";
 
 const FormSchema = z.object({
     email: z.string(),
@@ -43,7 +43,7 @@ export default function EditUserAccountForm(props: {
         try {
             const { message, userAccount, token } = await mutation.mutateAsync(data);
 
-            toast(message, { type: 'success' });
+            toast({ title: message });
 
             utils.auth.getCurrentUserAccount.setData(undefined, { userAccount });
 
