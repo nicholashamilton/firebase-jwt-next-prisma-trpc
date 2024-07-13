@@ -6,7 +6,6 @@
 - [x] TypeScript
 - [x] Firebase
 - [x] Tailwind CSS / SASS
-- [x] React Toastify
 - [x] shadcn/ui
 
 ### Set Up
