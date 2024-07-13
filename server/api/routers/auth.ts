@@ -91,7 +91,11 @@ export const authRouter = createTRPCRouter({
     updateProfile: protectedUserProcedure
         .input(z.object({
             email: z.string(),
-            username: z.string(),
+            username: z.string().min(1, {
+                message: 'Username must be at least 1 character.',
+            }).max(30, {
+                message: 'Username can only be 30 characters.',
+            }),
         }))
         .mutation(async ({ ctx, input }) => {
 

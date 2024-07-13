@@ -1,7 +1,6 @@
 "use client"
 
 import { api } from "@/server/apiClient";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NextRouter, useRouter } from "next/router";
 import { useUserContext } from "@/context/user/useUserContext";
@@ -16,23 +15,28 @@ import { ToastAction } from "../ui/toast";
 
 const FormSchema = z.object({
     title: z.string().min(2, {
-        message: "Title must be at least 2 characters.",
+        message: 'Title must be at least 2 characters.',
     }),
 });
 
 export function AddPostForm() {
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            title: '',
+        },
+    });
+
     const { user } = useUserContext();
     const router = useRouter();
     const mutation = api.posts.addPost.useMutation();
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const utils = api.useUtils();
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         if (!user) return promptLogin(router);
 
         try {
-            setIsSubmitting(true);
-
             await mutation.mutateAsync(data);
 
             utils.posts.getAllPosts.reset()
@@ -44,17 +48,7 @@ export function AddPostForm() {
         catch (error) {
             shadtoast({ title: 'An issue occurred while adding the post.', variant: 'destructive' });
         }
-        finally {
-            setIsSubmitting(false);
-        }
     }
-
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            title: '',
-        },
-    });
 
     return (
         <Form {...form}>
@@ -76,7 +70,7 @@ export function AddPostForm() {
                     )}
                 />
                 <Button type="submit">
-                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Add Post
                 </Button>
             </form>
@@ -87,6 +81,7 @@ export function AddPostForm() {
 function promptLogin(router?: NextRouter) {
     shadtoast({
         title: "You must be logged in to create a post.",
+        description: 'wejnfkwhbfhkwehkbfw',
         action: router ? (
             <ToastAction
                 onClick={() => router.push('/login')}
@@ -94,5 +89,6 @@ function promptLogin(router?: NextRouter) {
                 Login
             </ToastAction>
         ) : undefined,
+        variant: 'destructive'
     });
 }

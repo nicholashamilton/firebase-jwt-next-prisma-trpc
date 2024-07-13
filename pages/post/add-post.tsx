@@ -4,6 +4,7 @@ import { ReactElement } from "react";
 import SEO from "@/components/SEO";
 import RootLayout from "@/layouts/RootLayout";
 import { AddPostForm } from "@/components/forms/AddPostForm";
+import Typography from "@/components/ui/typography";
 
 export default function AddPostPage() {
     return (
@@ -13,9 +14,9 @@ export default function AddPostPage() {
                 description="Add Post"
             />
             <>
-                <h1 className="my-8 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl">
+                <Typography variant="h2" className="my-8">
                     Add Post
-                </h1>
+                </Typography>
                 <AddPostForm />
             </>
         </>
