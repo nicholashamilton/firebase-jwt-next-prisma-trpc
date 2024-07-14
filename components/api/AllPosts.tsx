@@ -4,6 +4,7 @@ import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import { useMemo } from "react";
 import NextLink from "../NextLink";
 import { DefaultUserAvatar, EmptyBoxIcon } from "../Icons";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function AllPosts() {
 
@@ -44,27 +45,26 @@ export default function AllPosts() {
                     <div className="grid grid-cols-1 gap-4">
                         {data?.pages.map((pages) => {
                             return pages?.posts.map((post) => (
-                                <div
-                                    key={post.id}
-                                    className="flex flex-col items-start border rounded border-gray-300 p-4"
-                                >
-                                    <span className="text-lg font-semibold leading-none tracking-tight text-gray-800">
-                                        {post.title}
-                                    </span>
-                                    <NextLink
-                                        href={`/user/${post.user.username}`}
-                                        className="flex flex-row items-center mt-3"
-                                    >
-                                        <div className="relative overflow-hidden rounded-full mr-2">
-                                            <DefaultUserAvatar
-                                                className="w-5 h-5 min-w-5 min-h-5"
-                                            />
+                                <Card key={post.id}>
+                                    <CardHeader className="p-4">
+                                        <CardTitle className="mb-1">{post.title}</CardTitle>
+                                        <div>
+                                            <NextLink
+                                                href={`/user/${post.user.username}`}
+                                                className="inline-flex flex-row items-center"
+                                            >
+                                                <div className="relative overflow-hidden rounded-full mr-2">
+                                                    <DefaultUserAvatar
+                                                        className="w-5 h-5 min-w-5 min-h-5"
+                                                    />
+                                                </div>
+                                                <span className="text-md font-medium leading-none tracking-tight text-gray-800">
+                                                    {post.user.username}
+                                                </span>
+                                            </NextLink>
                                         </div>
-                                        <span className="text-md font-medium leading-none tracking-tight text-gray-800">
-                                            {post.user.username}
-                                        </span>
-                                    </NextLink>
-                                </div>
+                                    </CardHeader>
+                                </Card>
                             ));
                         })}
                         {isFetching && hasNextPage ? (

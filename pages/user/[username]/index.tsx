@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { ReactElement, useMemo } from "react";
 import { DefaultUserAvatar } from "@/components/Icons";
 import RootLayout from "@/layouts/RootLayout";
+import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
+import Typography from "@/components/ui/typography";
 
 export default function UserPage() {
 
@@ -19,10 +21,8 @@ export default function UserPage() {
 
     if (isLoading) {
         return (
-            <div className="block">
-                <h1 className="my-8 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl">
-                    Loading User...
-                </h1>
+            <div className="p-8 py-24 w-full flex justify-center">
+                <LoadingSpinner />
             </div>
         );
     }
@@ -55,10 +55,10 @@ export default function UserPage() {
     }
 
     return (
-        <div className="block">
-            <h1 className="my-8 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl">
-                User Not Found...
-            </h1>
+        <div className="p-8 py-24 w-full flex justify-center">
+            <Typography variant="h2">
+                User not found...
+            </Typography>
         </div>
     );
 }

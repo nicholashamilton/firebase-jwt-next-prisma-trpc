@@ -59,7 +59,9 @@ export const postsRouter = createTRPCRouter({
      */
     addPost: protectedUserWithAccountProcedure
         .input(z.object({
-            title: z.string(),
+            title: z.string().min(2, {
+                message: "Title must be at least 2 characters.",
+            }),
         }))
         .mutation(async ({ ctx, input }) => {
             return {
