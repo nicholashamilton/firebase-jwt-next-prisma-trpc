@@ -36,7 +36,7 @@ export function LoginForm() {
             await signInWithEmailAndPassword(auth, data.email, data.password);
         }
         catch (error) {
-            let errorMessage = 'Unknown error occurred while creating user';
+            let errorMessage = 'Unknown error occurred while signing in.';
 
             if (isFirebaseError(error) && firebaseErrorRecord[error.code]) {
                 errorMessage = firebaseErrorRecord[error.code];
@@ -57,7 +57,7 @@ export function LoginForm() {
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter email..." {...field} />
+                                <Input required placeholder="Enter email..." {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -70,7 +70,7 @@ export function LoginForm() {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter password..." {...field} />
+                                <Input required placeholder="Enter password..." {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
