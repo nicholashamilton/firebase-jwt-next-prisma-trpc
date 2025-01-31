@@ -1,7 +1,7 @@
 # Firebase Auth JWT - Next - Prisma - tRPC
 
 - [x] Next
-- [x] Prisma
+- [x] Prisma (postgres)
 - [x] tRPC
 - [x] TypeScript
 - [x] Firebase
@@ -55,7 +55,7 @@ Replace variables with [firebase console](https://console.firebase.google.com/) 
 
 ### Prisma Set Up 
 
-Add database url to `.env.local`
+Add postgres database url to `.env.local`
 
 `DATABASE_URL=''` 
 

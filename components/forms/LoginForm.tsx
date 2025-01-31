@@ -70,7 +70,7 @@ export function LoginForm() {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input required placeholder="Enter password..." {...field} />
+                                <Input required placeholder="Enter password..." {...field} type="password" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
