@@ -3,7 +3,7 @@ import { useUserContext } from "@/context/user/useUserContext";
 import { ReactNode } from "react";
 import LoadingSpinner from "./LoadingSpinner/LoadingSpinner";
 import { useRedirectToLoginIfNoUser } from "@/hooks/user/useRedirectToLoginIfNoUser";
-import { User } from "@firebase/auth";
+import { User } from "firebase/auth";
 
 interface RequireUserProps {
     children: (user: User) => ReactNode;

@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { useRedirectToProfileIfUser } from "@/hooks/user/useRedirectToProfileIfUser";
-import { signInWithCustomToken } from "@firebase/auth";
+import { signInWithCustomToken } from "firebase/auth";
 import { showTrpcError } from "@/lib/trpc";
 import { auth } from "@/lib/firebase";
 

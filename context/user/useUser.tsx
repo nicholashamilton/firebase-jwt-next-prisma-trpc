@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { auth } from '@/lib/firebase';
-import { onAuthStateChanged, User } from '@firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { api } from "@/server/apiClient";
 
 export const useUser = () => {
